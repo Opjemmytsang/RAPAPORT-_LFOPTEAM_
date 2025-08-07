@@ -247,70 +247,68 @@
                     rows: { "D":[550,460,410,350,295,235,200], "E":[450,420,370,320,265,210,185], "F":[405,375,335,295,245,195,170], "G":[335,315,280,245,210,180,155], "H":[270,250,225,205,185,160,135], "I":[220,205,190,175,160,140,120], "J":[175,165,150,140,130,120,110], "K":[145,135,125,120,110,103,97], "L":[117,111,107,103,95,90,82], "M":[95,91,87,83,79,75,67] } }
             }
         };
-   const EXCHANGE_RATE = 7.85;
-       function getCaratRange(carat) {
-           return Object.keys(RAPAPORT['2024']).find(r => {
-               const [min, max] = r.split('-').map(parseFloat);
-               return carat >= min && carat <= max;
-           });
-       }
-       function searchPrice() {
-           const year      = document.getElementById('year').value;
-           const caratStr  = document.getElementById('carat').value;
-           const color     = document.getElementById('color').value;
-           const clarity   = document.getElementById('clarity').value;
-           const discStr   = document.getElementById('discount').value;
-           const resultDiv = document.getElementById('result');
-           const errorDiv  = document.getElementById('error');
-           resultDiv.innerHTML = '';
-           errorDiv.innerHTML  = '';
-           // 驗證輸入
-           if (!caratStr)       return errorDiv.textContent = '❌ 請輸入主石份數';
-           if (!color)          return errorDiv.textContent = '❌ 請選擇顏色';
-           if (!clarity)        return errorDiv.textContent = '❌ 請選擇淨度';
-           const carat = parseFloat(caratStr);
-           if (isNaN(carat))    return errorDiv.textContent = '❌ 主石份數必須是數字';
-           if (carat < 0.3 || carat > 3.99)
-               return errorDiv.textContent = '❌ 主石份數必須在0.30-3.99克拉之間';
-           let discount = 0;
-           if (discStr) {
-               discount = parseFloat(discStr);
-               if (isNaN(discount)) return errorDiv.textContent = '❌ 折扣必須是數字';
-               if (discount < 0 || discount > 100)
-                   return errorDiv.textContent = '❌ 折扣必須在0-100之間';
-           }
-           // 找出區間
-           const rangeData = RAPAPORT[year]?.[getCaratRange(carat)];
-           if (!rangeData) return errorDiv.textContent = '❌ 無對應數據';
-           const headers   = rangeData.headers;
-           const row       = rangeData.rows[color];
-           const idx       = headers.indexOf(clarity);
-           if (idx === -1 || !row)
-               return errorDiv.textContent = '❌ 無對應淨度或顏色數據';
-           // 每克拉報價 (USD)
-           const rapPerCarat = row[idx];
-           // 計算總金額
-           const baseUSD = rapPerCarat * carat;
-           const finalUSD = Math.round(baseUSD * (1 - discount / 100));
-           // 轉港幣
-           const finalHKD = Math.round(finalUSD * EXCHANGE_RATE);
-           // 顯示結果
-           let html = `<div class="price-display">US$${finalUSD.toLocaleString()}</div>`;
-           if (discount > 0) {
-               html += `<div class="price-note">(原價: US$${Math.round(baseUSD).toLocaleString()})</div>`;
-               html += `<div class="discount-label">${discount}% Off</div>`;
-           }
-           html += `<div class="hkd-price">約 HKD ${finalHKD.toLocaleString()}</div>`;
-           html += `<div class="details">
-<div class="detail-item"><div>📅 年份</div><div><strong>${year}</strong></div></div>
-<div class="detail-item"><div>💎 份數</div><div><strong>${carat} ct</strong></div></div>
-<div class="detail-item"><div>🎨 顏色</div><div><strong>${color}</strong></div></div>
-<div class="detail-item"><div>🔍 淨度</div><div><strong>${clarity}</strong></div></div>
-</div>`;
-           resultDiv.innerHTML = html;
-       }
-       document.getElementById('searchBtn').addEventListener('click', searchPrice);
-       document.addEventListener('keypress', e => e.key === 'Enter' && searchPrice());
-</script>
+  const EXCHANGE_RATE = 7.85;
+
+        function getCaratRange(carat) {
+            return Object.keys(RAPAPORT['2024']).find(r => {
+                const [min, max] = r.split('-').map(parseFloat);
+                return carat >= min && carat <= max;
+            });
+        }
+
+        function searchPrice() {
+            const year    = document.getElementById('year').value;
+            const carat   = parseFloat(document.getElementById('carat').value || 0);
+            const color   = document.getElementById('color').value;
+            const clarity = document.getElementById('clarity').value;
+            const discount= parseFloat(document.getElementById('discount').value || 0);
+            const result  = document.getElementById('result');
+            const error   = document.getElementById('error');
+            result.innerHTML = '';
+            error.textContent = '';
+
+            if (!carat || !color || !clarity) {
+                error.textContent = '❌ 請確實輸入所有參數';
+                return;
+            }
+            if (isNaN(carat) || carat < 0.3 || carat > 3.99) {
+                error.textContent = '❌ 主石份數需介於 0.30-3.99'; return;
+            }
+            if (isNaN(discount) || discount < 0 || discount > 100) {
+                error.textContent = '❌ 折扣需介於 0-100%'; return;
+            }
+
+            const range = getCaratRange(carat);
+            const data  = RAPAPORT[year]?.[range];
+            if (!data) { error.textContent = '❌ 找不到對應數據'; return; }
+
+            const idx      = data.headers.indexOf(clarity);
+            const perCtArr = data.rows[color];
+            if (idx < 0 || !perCtArr) { error.textContent = '❌ 顏色或淨度無對應'; return; }
+
+            // 1. RAPAPORT 價錢 (USD per ct)
+            const rapUSD = perCtArr[idx] * 100;
+            // 2. 折後每克拉 USD
+            const pCtsUSD = Math.round(rapUSD * (1 - discount / 100));
+            // 3. Amount US$
+            const amtUSD = parseFloat((pCtsUSD * carat).toFixed(2));
+            // 4. Price/Cts. @HKD
+            const pCtsHKD = parseFloat((pCtsUSD * EXCHANGE_RATE).toFixed(2));
+            // 5. Amount HK$
+            const amtHKD  = parseFloat((amtUSD * EXCHANGE_RATE).toFixed(2));
+
+            result.innerHTML = `
+            <div class="details">
+                <div class="detail-item"><div>1. RAPAPORT 價錢</div><div><strong>US$${rapUSD.toLocaleString()}</strong></div></div>
+                <div class="detail-item"><div>2. Price/Cts. @USD</div><div><strong>US$${pCtsUSD.toLocaleString()}</strong></div></div>
+                <div class="detail-item"><div>3. Amount US$</div><div><strong>US$${amtUSD.toLocaleString()}</strong></div></div>
+                <div class="detail-item"><div>4. Price/Cts. @HKD</div><div><strong>HK$${pCtsHKD.toLocaleString()}</strong></div></div>
+                <div class="detail-item"><div>5. Amount HK$</div><div><strong>HK$${amtHKD.toLocaleString()}</strong></div></div>
+            </div>`;
+        }
+
+        document.getElementById('searchBtn').addEventListener('click', searchPrice);
+        document.addEventListener('keypress', e => e.key === 'Enter' && searchPrice());
+    </script>
 </body>
 </html>
