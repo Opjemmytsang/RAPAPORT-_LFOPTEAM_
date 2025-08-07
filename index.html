@@ -563,7 +563,7 @@
             
             // 显示结果
             resultDiv.innerHTML = `
-                <div class="price-display">US$${price}*100</div>
+                <div class="price-display">US$${discountedPrice.toLocaleString()}</div>
                 <div class="price-note">(大約市場價值)</div>
                 <div class="hkd-price">約 HKD ${priceHKD.toLocaleString()}</div>
                 
@@ -610,4 +610,5 @@
     </script>
 </body>
 </html>
+
 
