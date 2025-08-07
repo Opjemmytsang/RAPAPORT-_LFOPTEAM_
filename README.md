@@ -1,2 +1,0 @@
-# RAPAPORT-_LFOPTEAM_
-RAPAPORT 鑽石報價查詢
