@@ -1,388 +1,189 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RAPAPORT 鑽石報價查詢</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #1a2a6c 0%, #2a5298 100%);
-            padding: 15px;
-            min-height: 100vh;
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 500px;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-            overflow: hidden;
-            animation: fadeIn 0.8s ease-out;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        header {
-            background: linear-gradient(120deg, #1a2a6c, #2a5298);
-            color: white;
-            padding: 25px 20px;
-            text-align: center;
-            position: relative;
-        }
-        
-        header::before {
-            content: "💎";
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 40px;
-            opacity: 0.15;
-        }
-        
-        h1 {
-            font-size: 1.8rem;
-            margin-bottom: 8px;
-            font-weight: 700;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        }
-        
-        .subtitle {
-            font-size: 1rem;
-            opacity: 0.9;
-            margin-bottom: 5px;
-        }
-        
-        .exchange-rate {
-            background: rgba(255, 255, 255, 0.15);
-            display: inline-block;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            margin-top: 8px;
-            font-weight: 500;
-        }
-        
-        .content {
-            padding: 20px;
-        }
-        
-        .input-group {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .input-field {
-            margin-bottom: 15px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #2c3e50;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-        }
-        
-        label i {
-            margin-right: 10px;
-            font-size: 20px;
-            color: #4a6cf7;
-        }
-        
-        input, select {
-            width: 100%;
-            padding: 15px;
-            border: 1px solid #d1d9e6;
-            border-radius: 10px;
-            font-size: 16px;
-            background: #f8fafc;
-            appearance: none;
-            -webkit-appearance: none;
-            transition: all 0.3s ease;
-        }
-        
-        input:focus, select:focus {
-            outline: none;
-            border-color: #4a6cf7;
-            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.2);
-        }
-        
-        .button-group {
-            text-align: center;
-            margin: 25px 0 15px;
-        }
-        
-        button {
-            background: linear-gradient(to right, #4a6cf7, #6a5af9);
-            color: white;
-            border: none;
-            padding: 17px 45px;
-            font-size: 18px;
-            font-weight: 600;
-            border-radius: 12px;
-            cursor: pointer;
-            width: 100%;
-            max-width: 300px;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(74, 108, 247, 0.4);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(74, 108, 247, 0.5);
-        }
-        
-        button:active {
-            transform: translateY(1px);
-        }
-        
-        .result-container {
-            background: #f8fafd;
-            border-radius: 12px;
-            padding: 25px 20px;
-            border: 1px solid #e2e8f0;
-            margin-top: 15px;
-            text-align: center;
-        }
-        
-        #result {
-            font-size: 18px;
-            line-height: 1.6;
-            color: #2d3748;
-            min-height: 150px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        #error {
-            color: #e53e3e;
-            font-size: 15px;
-            margin-top: 15px;
-            text-align: center;
-            min-height: 22px;
-            font-weight: 500;
-        }
-        
-        .price-display {
-            font-size: 40px;
-            font-weight: 700;
-            color: #4a6cf7;
-            margin: 15px 0;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .price-note {
-            font-size: 16px;
-            color: #718096;
-            margin-top: 5px;
-            font-weight: 500;
-        }
-        
-        .hkd-price {
-            font-size: 24px;
-            font-weight: 600;
-            color: #1a2a6c;
-            margin: 10px 0;
-            padding: 8px 15px;
-            border-radius: 8px;
-            background: rgba(26, 42, 108, 0.08);
-        }
-        
-        .discount-price {
-            font-size: 32px;
-            font-weight: 700;
-            color: #2e7d32;
-            margin: 10px 0;
-            padding: 10px 20px;
-            border-radius: 8px;
-            background: rgba(46, 125, 50, 0.1);
-        }
-        
-        .discount-label {
-            font-size: 16px;
-            color: #2e7d32;
-            margin-top: 5px;
-            font-weight: 600;
-        }
-        
-        .details {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
-            width: 100%;
-            max-width: 400px;
-        }
-        
-        .detail-item {
-            background: rgba(74, 108, 247, 0.08);
-            padding: 12px 15px;
-            border-radius: 10px;
-            font-weight: 500;
-            min-width: 140px;
-        }
-        
-        .current-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: #1a2a6c;
-            margin-top: 25px;
-            padding: 12px 25px;
-            background: linear-gradient(to right, #4a6cf7, #6a5af9);
-            color: white;
-            border-radius: 10px;
-            display: inline-block;
-            box-shadow: 0 4px 10px rgba(74, 108, 247, 0.3);
-        }
-        
-        .value-label {
-            font-size: 16px;
-            font-weight: 600;
-            color: #4a5568;
-            margin-top: 8px;
-        }
-        
-        .note {
-            margin-top: 25px;
-            padding: 15px;
-            background: #edf2f7;
-            border-radius: 10px;
-            font-size: 14px;
-            color: #4a5568;
-            line-height: 1.6;
-            border-left: 4px solid #4a6cf7;
-        }
-        
-        footer {
-            text-align: center;
-            padding: 20px 15px;
-            color: #718096;
-            font-size: 14px;
-            border-top: 1px solid #e2e8f0;
-        }
-        
-        @media (max-width: 400px) {
-            header {
-                padding: 20px 15px;
-            }
-            
-            h1 {
-                font-size: 1.6rem;
-            }
-            
-            button {
-                padding: 15px;
-                font-size: 16px;
-            }
-            
-            .price-display, .current-value, .discount-price {
-                font-size: 32px;
-            }
-            
-            .detail-item {
-                min-width: 100%;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RAPAPORT 鑽石報價查詢</title>
+<style>
+       * {
+           box-sizing: border-box;
+           margin: 0;
+           padding: 0;
+           -webkit-tap-highlight-color: transparent;
+           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+       }
+       body {
+           background: linear-gradient(135deg, #1a2a6c 0%, #2a5298 100%);
+           padding: 15px;
+           min-height: 100vh;
+           color: #333;
+           display: flex;
+           justify-content: center;
+           align-items: center;
+       }
+       .container {
+           width: 100%;
+           max-width: 500px;
+           background: white;
+           border-radius: 16px;
+           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+           overflow: hidden;
+       }
+       header {
+           background: linear-gradient(120deg, #1a2a6c, #2a5298);
+           color: white;
+           padding: 25px 20px;
+           text-align: center;
+           position: relative;
+       }
+       header::before {
+           content: "💎";
+           position: absolute;
+           top: 15px;
+           right: 20px;
+           font-size: 40px;
+           opacity: 0.15;
+       }
+       h1 {
+           font-size: 1.8rem;
+           margin-bottom: 8px;
+           font-weight: 700;
+           text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+       }
+       .subtitle {
+           font-size: 1rem;
+           opacity: 0.9;
+           margin-bottom: 5px;
+       }
+       .exchange-rate {
+           background: rgba(255, 255, 255, 0.15);
+           display: inline-block;
+           padding: 5px 12px;
+           border-radius: 20px;
+           font-size: 14px;
+           margin-top: 8px;
+           font-weight: 500;
+       }
+       .content { padding: 20px; }
+       .input-group { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px; }
+       .input-field { margin-bottom: 15px; }
+       label {
+           display: flex; align-items: center;
+           margin-bottom: 8px;
+           font-weight: 600;
+           color: #2c3e50;
+           font-size: 16px;
+       }
+       label i { margin-right: 10px; font-size: 20px; color: #4a6cf7; }
+       input, select {
+           width: 100%;
+           padding: 15px;
+           border: 1px solid #d1d9e6;
+           border-radius: 10px;
+           font-size: 16px;
+           background: #f8fafc;
+           transition: all 0.3s ease;
+       }
+       input:focus, select:focus {
+           outline: none;
+           border-color: #4a6cf7;
+           box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.2);
+       }
+       .button-group { text-align: center; margin: 25px 0 15px; }
+       button {
+           background: linear-gradient(to right, #4a6cf7, #6a5af9);
+           color: white;
+           border: none;
+           padding: 17px 45px;
+           font-size: 18px;
+           font-weight: 600;
+           border-radius: 12px;
+           cursor: pointer;
+           width: 100%;
+           max-width: 300px;
+           transition: all 0.3s ease;
+           box-shadow: 0 5px 15px rgba(74, 108, 247, 0.4);
+       }
+       button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(74, 108, 247, 0.5); }
+       button:active { transform: translateY(1px); }
+       .result-container {
+           background: #f8fafd;
+           border-radius: 12px;
+           padding: 25px 20px;
+           border: 1px solid #e2e8f0;
+           margin-top: 15px;
+           text-align: center;
+       }
+       #result { font-size: 18px; line-height: 1.6; color: #2d3748; min-height: 150px; }
+       #error { color: #e53e3e; font-size: 15px; margin-top: 15px; font-weight: 500; }
+       .price-display { font-size: 40px; font-weight: 700; color: #4a6cf7; margin: 15px 0; }
+       .price-note, .discount-label { font-size: 16px; color: #2e7d32; margin-top: 5px; font-weight: 500; }
+       .hkd-price { font-size: 24px; font-weight: 600; color: #1a2a6c; margin: 10px 0; padding: 8px 15px; border-radius: 8px; background: rgba(26, 42, 108, 0.08); }
+       .details { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 20px; width: 100%; max-width: 400px; }
+       .detail-item { background: rgba(74, 108, 247, 0.08); padding: 12px 15px; border-radius: 10px; font-weight: 500; min-width: 140px; }
+       footer { text-align: center; padding: 20px 15px; color: #718096; font-size: 14px; border-top: 1px solid #e2e8f0; }
+       @media (max-width: 400px) {
+           h1 { font-size: 1.6rem; }
+           button { padding: 15px; font-size: 16px; }
+           .price-display { font-size: 32px; }
+           .detail-item { min-width: 100%; }
+       }
+</style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>RAPAPORT 鑽石報價查詢</h1>
-            <div class="subtitle">市場鑽石價格計算工具</div>
-            <div class="exchange-rate">1 USD = 7.85 HKD</div>
-        </header>
-        
-        <div class="content">
-            <div class="input-group">
-                <div class="input-field">
-                    <label for="carat"><i>💎</i> 主石份數 (ct)</label>
-                    <input type="number" id="carat" step="0.01" placeholder="例如: 1.25" min="0.30" max="4" inputmode="decimal">
-                </div>
-                
-                <div class="input-field">
-                    <label for="color"><i>🎨</i> 顏色 (Color)</label>
-                    <select id="color">
-                        <option value="">請選擇顏色</option>
-                        <option>D</option><option>E</option><option>F</option>
-                        <option>G</option><option>H</option><option>I</option>
-                        <option>J</option><option>K</option><option>L</option><option>M</option>
-                    </select>
-                </div>
-                
-                <div class="input-field">
-                    <label for="clarity"><i>🔍</i> 淨度 (Clarity)</label>
-                    <select id="clarity">
-                        <option value="">請選擇淨度</option>
-                        <option>IF</option><option>VVS1</option><option>VVS2</option>
-                        <option>VS1</option><option>VS2</option><option>SI1</option><option>SI2</option>
-                    </select>
-                </div>
-                
-                <div class="input-field">
-                    <label for="year"><i>📅</i> 年份</label>
-                    <select id="year">
-                        <option value="2023">2023</option>
-                        <option value="2024" selected>2024</option>
-                        <option value="2025">2025</option>
-                    </select>
-                </div>
-                
-                <div class="input-field">
-                    <label for="discount"><i>💰</i> Discount (%)</label>
-                    <input type="number" id="discount" step="1" placeholder="例如: 30" min="0" max="100" value="0">
-                </div>
-            </div>
-            
-            <div class="button-group">
-                <button id="searchBtn">查詢鑽石報價</button>
-            </div>
-            
-            <div class="result-container">
-                <div id="result">
-                    <div style="color: #a0aec0; padding: 30px;">
-                        請輸入鑽石參數後點擊查詢按鈕
-                    </div>
-                </div>
-                <div id="error"></div>
-            </div>
-            
-            <div class="note">
-                <p><strong>使用說明：</strong> 本工具基於RAPAPORT國際鑽石報價表數據，報價結果顯示為現時市場鑽石約價。現值價為折扣後價格。</p>
-            </div>
-        </div>
-        
-        <footer>
-            <p>© 2023-2025 RAPAPORT鑽石報價查詢系統 | 六福專用版</p>
-        </footer>
-    </div>
-
-    <script>
+<div class="container">
+<header>
+<h1>RAPAPORT 鑽石報價查詢</h1>
+<div class="subtitle">市場鑽石價格計算工具</div>
+<div class="exchange-rate">1 USD = 7.85 HKD</div>
+</header>
+<div class="content">
+<div class="input-group">
+<div class="input-field">
+<label for="carat"><i>💎</i> 主石份數 (ct)</label>
+<input type="number" id="carat" step="0.01" placeholder="例如: 1.25" min="0.30" max="3.99" inputmode="decimal">
+</div>
+<div class="input-field">
+<label for="color"><i>🎨</i> 顏色 (Color)</label>
+<select id="color">
+<option value="">請選擇顏色</option>
+<option>D</option><option>E</option><option>F</option>
+<option>G</option><option>H</option><option>I</option>
+<option>J</option><option>K</option><option>L</option><option>M</option>
+</select>
+</div>
+<div class="input-field">
+<label for="clarity"><i>🔍</i> 淨度 (Clarity)</label>
+<select id="clarity">
+<option value="">請選擇淨度</option>
+<option>IF</option><option>VVS1</option><option>VVS2</option>
+<option>VS1</option><option>VS2</option><option>SI1</option><option>SI2</option>
+</select>
+</div>
+<div class="input-field">
+<label for="year"><i>📅</i> 年份</label>
+<select id="year">
+<option value="2023">2023</option>
+<option value="2024" selected>2024</option>
+<option value="2025">2025</option>
+</select>
+</div>
+<div class="input-field">
+<label for="discount"><i>💰</i> 折扣 (%)</label>
+<input type="number" id="discount" step="1" placeholder="例如: 30" min="0" max="100" value="0">
+</div>
+</div>
+<div class="button-group">
+<button id="searchBtn">查詢鑽石報價</button>
+</div>
+<div class="result-container">
+<div id="result"><div style="color: #a0aec0; padding: 30px;">請輸入鑽石參數後點擊查詢按鈕</div></div>
+<div id="error"></div>
+</div>
+</div>
+<footer>© 2023-2025 RAPAPORT鑽石報價查詢系統 | 六福專用版</footer>
+</div>
+<script>
         // RAPAPORT钻石报价数据（已修正错误）
         const RAPAPORT = {
             "2023": {
@@ -447,183 +248,68 @@
             }
         };
 
-        // 匯率常數
         const EXCHANGE_RATE = 7.85;
-
-        // 获取克拉范围
-        function getCaratRange(carat) {
-            const ranges = Object.keys(RAPAPORT["2023"]);
-            for (let r of ranges) {
-                const [min, max] = r.split('-').map(parseFloat);
-                if (carat >= min && carat <= max) return r;
-            }
-            return null;
-        }
-
-        // 查找钻石价格
-        function searchPrice() {
-            const year = document.getElementById("year").value;
-            const caratInput = document.getElementById("carat").value;
-            const color = document.getElementById("color").value;
-            const clarityIndex = rangeData.headers.indexOf(clarity);
-                const pricePerCarat = colorData[clarityIndex];
-    
-    // 根據克拉範圍決定使用哪個計算公式
-    let basePriceUSD;
-    if (carat >= 1) {
-        // 卡上公式（>=1克拉）
-        basePriceUSD = pricePerCarat * 100;
-    } else {
-        // 卡下公式（<1克拉）
-        basePriceUSD = pricePerCarat * 100 * carat;
-    }
-            const discountInput = document.getElementById("discount").value;
-            
-            const resultDiv = document.getElementById("result");
-            const errorDiv = document.getElementById("error");
-            
-            // 清空之前的结果
-            resultDiv.innerHTML = "";
-            errorDiv.innerHTML = "";
-            
-            // 验证输入
-            if (!caratInput) {
-                errorDiv.innerHTML = "❌ 請輸入主石份數";
-                return;
-            }
-            
-            const carat = parseFloat(caratInput);
-            if (isNaN(carat)) {
-                errorDiv.innerHTML = "❌ 主石份數必須是數字";
-                return;
-            }
-            
-            if (carat < 0.3 || carat > 3.99) {
-                errorDiv.innerHTML = "❌ 主石份數必須在0.30-3.99克拉之間";
-                return;
-            }
-            
-            if (!color) {
-                errorDiv.innerHTML = "❌ 請選擇顏色";
-                return;
-            }
-            
-            if (!clarity) {
-                errorDiv.innerHTML = "❌ 請選擇淨度";
-                return;
-            }
-            
-            let discountValue = 0;
-            if (discountInput) {
-                discountValue = parseFloat(discountInput);
-                if (isNaN(discountValue)) {
-                    errorDiv.innerHTML = "❌ 折扣必須是數字";
-                    return;
-                }
-                
-                if (discountValue < 0 || discountValue > 100) {
-                    errorDiv.innerHTML = "❌ 折扣必須在0-100之間";
-                    return;
-                }
-            }
-            
-            // 获取克拉范围
-            const range = getCaratRange(carat);
-            if (!range) {
-                errorDiv.innerHTML = "❌ 無符合的份數區間";
-                return;
-            }
-            
-            // 获取年份数据
-            const yearData = RAPAPORT[year];
-            if (!yearData) {
-                errorDiv.innerHTML = "❌ 該年份數據不存在";
-                return;
-            }
-            
-            // 获取范围数据
-            const rangeData = yearData[range];
-            if (!rangeData) {
-                errorDiv.innerHTML = "❌ 該份數區間數據不存在";
-                return;
-            }
-            
-            // 获取颜色数据
-            const colorData = rangeData.rows[color];
-            if (!colorData) {
-                errorDiv.innerHTML = "❌ 該顏色數據不存在";
-                return;
-            }
-            
-            // 获取净度索引
-            const clarityIndex = rangeData.headers.indexOf(clarity);
-            if (clarityIndex === -1) {
-                errorDiv.innerHTML = "❌ 該淨度數據不存在";
-                return;
-            }
-            
-            // 获取价格
-            const price = colorData[clarityIndex];
-            
-            // 计算折扣后价格
-            const discountedPriceUSD = Math.round(basePriceUSD * (1 - discountValue / 100));
-            
-            // 计算港元价格
-            const priceHKD = Math.round(price * 100 * EXCHANGE_RATE);
-            const discountedPriceHKD = Math.round(discountedPrice * EXCHANGE_RATE);
-            
-            // 显示结果
-            resultDiv.innerHTML = `
-                <div class="price-display">US$${discountedPrice.toLocaleString()}</div>
-                <div class="price-note">(大約市場價值)</div>
-                <div class="hkd-price">約 HKD ${priceHKD.toLocaleString()}</div>
-                
-                ${discountValue > 0 ? `
-                <div class="discount-price">US$${discountedPrice.toLocaleString()}</div>
-                <div class="discount-label">折扣後價格 (${discountValue}% off)</div>
-                <div class="hkd-price">約 HKD ${discountedPriceHKD.toLocaleString()}</div>
-                ` : ''}
-                
-                <div class="details">
-                    <div class="detail-item">
-                        <div>📅 年份</div>
-                        <div><strong>${year}</strong></div>
-                    </div>
-                    <div class="detail-item">
-                        <div>💎 份數</div>
-                        <div><strong>${carat} ct</strong></div>
-                    </div>
-                    <div class="detail-item">
-                        <div>🎨 顏色</div>
-                        <div><strong>${color}</strong></div>
-                    </div>
-                    <div class="detail-item">
-                        <div>🧼 淨度</div>
-                        <div><strong>${clarity}</strong></div>
-                    </div>
-                </div>
-                
-                <div class="current-value">US$${discountedPrice.toLocaleString()}</div>
-                <div class="value-label">現值價約</div>
-                <div class="hkd-price">約 HKD ${discountedPriceHKD.toLocaleString()}</div>
-            `;
-        }
-
-        // 添加按钮点击事件监听
-        document.getElementById("searchBtn").addEventListener("click", searchPrice);
-        
-        // 添加键盘事件监听，按Enter键也可查询
-        document.addEventListener("keypress", function(e) {
-            if (e.key === "Enter") {
-                searchPrice();
-            }
-        });
-    </script>
+       function getCaratRange(carat) {
+           return Object.keys(RAPAPORT['2023']).find(r => {
+               const [min, max] = r.split('-').map(parseFloat);
+               return carat >= min && carat <= max;
+           });
+       }
+       function searchPrice() {
+           const year = document.getElementById('year').value;
+           const caratInput = document.getElementById('carat').value;
+           const color = document.getElementById('color').value;
+           const clarity = document.getElementById('clarity').value;
+           const discountInput = document.getElementById('discount').value;
+           const resultDiv = document.getElementById('result');
+           const errorDiv = document.getElementById('error');
+           resultDiv.innerHTML = '';
+           errorDiv.innerHTML = '';
+           if (!caratInput) { errorDiv.textContent = '❌ 請輸入主石份數'; return; }
+           const carat = parseFloat(caratInput);
+           if (isNaN(carat)) { errorDiv.textContent = '❌ 主石份數必須是數字'; return; }
+           if (carat < 0.3 || carat > 3.99) { errorDiv.textContent = '❌ 主石份數必須在0.30-3.99克拉之間'; return; }
+           if (!color) { errorDiv.textContent = '❌ 請選擇顏色'; return; }
+           if (!clarity) { errorDiv.textContent = '❌ 請選擇淨度'; return; }
+           let discountValue = 0;
+           if (discountInput) {
+               discountValue = parseFloat(discountInput);
+               if (isNaN(discountValue)) { errorDiv.textContent = '❌ 折扣必須是數字'; return; }
+               if (discountValue < 0 || discountValue > 100) { errorDiv.textContent = '❌ 折扣必須在0-100之間'; return; }
+           }
+           const range = getCaratRange(carat);
+           if (!range) { errorDiv.textContent = '❌ 無符合的份數區間'; return; }
+           const yearData = RAPAPORT[year];
+           if (!yearData) { errorDiv.textContent = '❌ 該年份數據不存在'; return; }
+           const rangeData = yearData[range];
+           if (!rangeData) { errorDiv.textContent = '❌ 該份數區間數據不存在'; return; }
+           const colorData = rangeData.rows[color];
+           if (!colorData) { errorDiv.textContent = '❌ 該顏色數據不存在'; return; }
+           const clarityIndex = rangeData.headers.indexOf(clarity);
+           if (clarityIndex === -1) { errorDiv.textContent = '❌ 該淨度數據不存在'; return; }
+           const pricePerCarat = colorData[clarityIndex];
+           let basePriceUSD = pricePerCarat * 100;
+           if (carat < 1) { basePriceUSD = pricePerCarat * 100 * carat; }
+           const discountedPriceUSD = Math.round(basePriceUSD * (1 - discountValue / 100));
+           const displayPriceUSD = discountValue > 0 ? discountedPriceUSD : Math.round(basePriceUSD);
+           const priceHKD = Math.round(basePriceUSD * EXCHANGE_RATE);
+           const discountedPriceHKD = Math.round(discountedPriceUSD * EXCHANGE_RATE);
+           let html = `<div class="price-display">US$${displayPriceUSD.toLocaleString()}</div>`;
+           if (discountValue > 0) {
+               html += `<div class="price-note">原價: US$${Math.round(basePriceUSD).toLocaleString()}</div>`;
+               html += `<div class="discount-label">${discountValue}% Off</div>`;
+           }
+           html += `<div class="hkd-price">約 HKD ${ (discountValue > 0 ? discountedPriceHKD : priceHKD).toLocaleString() }</div>`;
+           html += `<div class="details">
+<div class="detail-item"><div>📅 年份</div><div><strong>${year}</strong></div></div>
+<div class="detail-item"><div>💎 份數</div><div><strong>${carat} ct</strong></div></div>
+<div class="detail-item"><div>🎨 顏色</div><div><strong>${color}</strong></div></div>
+<div class="detail-item"><div>🔍 淨度</div><div><strong>${clarity}</strong></div></div>
+</div>`;
+           resultDiv.innerHTML = html;
+       }
+       document.getElementById('searchBtn').addEventListener('click', searchPrice);
+       document.addEventListener('keypress', function(e) { if (e.key === 'Enter') searchPrice(); });
+</script>
 </body>
 </html>
-
-
-
-
-
-
