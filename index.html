@@ -289,7 +289,7 @@
            if (clarityIndex === -1) { errorDiv.textContent = '❌ 該淨度數據不存在'; return; }
            const pricePerCarat = colorData[clarityIndex];
            let basePriceUSD = pricePerCarat * 100;
-           if (carat < 1) { basePriceUSD = pricePerCarat * 100 * carat; }
+           if (carat < 1) { basePriceUSD = pricePerCarat * carat; }
            const discountedPriceUSD = Math.round(basePriceUSD * (1 - discountValue / 100));
            const displayPriceUSD = discountValue > 0 ? discountedPriceUSD : Math.round(basePriceUSD);
            const priceHKD = Math.round(basePriceUSD * EXCHANGE_RATE);
@@ -313,3 +313,4 @@
 </script>
 </body>
 </html>
+
