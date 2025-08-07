@@ -465,7 +465,18 @@
             const year = document.getElementById("year").value;
             const caratInput = document.getElementById("carat").value;
             const color = document.getElementById("color").value;
-            const clarity = document.getElementById("clarity").value;
+            const clarityIndex = rangeData.headers.indexOf(clarity);
+                const pricePerCarat = colorData[clarityIndex];
+    
+    // 根據克拉範圍決定使用哪個計算公式
+    let basePriceUSD;
+    if (carat >= 1) {
+        // 卡上公式（>=1克拉）
+        basePriceUSD = pricePerCarat * 100;
+    } else {
+        // 卡下公式（<1克拉）
+        basePriceUSD = pricePerCarat * 100 * carat;
+    }
             const discountInput = document.getElementById("discount").value;
             
             const resultDiv = document.getElementById("result");
@@ -555,7 +566,7 @@
             const price = colorData[clarityIndex];
             
             // 计算折扣后价格
-            const discountedPrice = Math.round(price * 100 * (1 - discountValue / 100));
+            const discountedPriceUSD = Math.round(basePriceUSD * (1 - discountValue / 100));
             
             // 计算港元价格
             const priceHKD = Math.round(price * 100 * EXCHANGE_RATE);
@@ -610,6 +621,7 @@
     </script>
 </body>
 </html>
+
 
 
 
