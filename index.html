@@ -122,11 +122,163 @@
        .details { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 20px; width: 100%; max-width: 400px; }
        .detail-item { background: rgba(74, 108, 247, 0.08); padding: 12px 15px; border-radius: 10px; font-weight: 500; min-width: 140px; }
        footer { text-align: center; padding: 20px 15px; color: #718096; font-size: 14px; border-top: 1px solid #e2e8f0; }
+       
+       /* 優化結果介面 */
+       .result-header {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           background: linear-gradient(120deg, #f8fafd, #eef2ff);
+           border-radius: 12px;
+           padding: 15px;
+           margin-bottom: 20px;
+           border: 1px solid #e0e7ff;
+           box-shadow: 0 4px 12px rgba(74, 108, 247, 0.1);
+       }
+       .diamond-info {
+           text-align: left;
+       }
+       .diamond-info h3 {
+           font-size: 1.1rem;
+           color: #1a2a6c;
+           margin-bottom: 8px;
+       }
+       .diamond-spec {
+           font-size: 0.9rem;
+           color: #4a5568;
+           display: flex;
+           flex-wrap: wrap;
+           gap: 8px;
+       }
+       .spec-item {
+           background: rgba(74, 108, 247, 0.1);
+           padding: 4px 10px;
+           border-radius: 20px;
+           font-size: 0.85rem;
+       }
+       .diamond-icon {
+           font-size: 2.5rem;
+           color: #4a6cf7;
+           opacity: 0.8;
+       }
+       .price-summary {
+           background: linear-gradient(135deg, #4a6cf7, #6a5af9);
+           border-radius: 12px;
+           padding: 25px 15px;
+           color: white;
+           margin: 20px auto;
+           max-width: 90%;
+           box-shadow: 0 6px 18px rgba(74, 108, 247, 0.3);
+       }
+       .price-title {
+           font-size: 1.1rem;
+           margin-bottom: 15px;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           gap: 8px;
+       }
+       .price-title i {
+           font-size: 1.4rem;
+       }
+       .usd-price {
+           font-size: 2.5rem;
+           font-weight: 700;
+           margin: 10px 0;
+           text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+       }
+       .hkd-equivalent {
+           font-size: 1.2rem;
+           opacity: 0.9;
+           margin-top: 5px;
+       }
+       .price-per-carat {
+           background: rgba(255, 255, 255, 0.15);
+           border-radius: 10px;
+           padding: 10px;
+           margin-top: 15px;
+           font-size: 0.9rem;
+       }
+       .price-breakdown {
+           background: #f8fafd;
+           border-radius: 12px;
+           padding: 20px 15px;
+           border: 1px solid #e2e8f0;
+           margin-top: 20px;
+       }
+       .breakdown-title {
+           font-size: 1.1rem;
+           color: #1a2a6c;
+           margin-bottom: 15px;
+           text-align: center;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           gap: 8px;
+       }
+       .breakdown-grid {
+           display: grid;
+           grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+           gap: 12px;
+           margin-top: 15px;
+       }
+       .breakdown-card {
+           background: white;
+           border-radius: 10px;
+           padding: 15px 10px;
+           box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+           border: 1px solid #edf2f7;
+           transition: transform 0.3s ease;
+       }
+       .breakdown-card:hover {
+           transform: translateY(-3px);
+           box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+       }
+       .breakdown-card h4 {
+           font-size: 0.85rem;
+           color: #4a5568;
+           margin-bottom: 8px;
+       }
+       .breakdown-value {
+           font-size: 1.1rem;
+           font-weight: 600;
+           color: #1a2a6c;
+       }
+       .breakdown-value.usd {
+           color: #4a6cf7;
+       }
+       .breakdown-value.hkd {
+           color: #2e7d32;
+       }
+       .discount-badge {
+           background: linear-gradient(135deg, #2e7d32, #43a047);
+           color: white;
+           padding: 3px 12px;
+           border-radius: 20px;
+           font-size: 0.8rem;
+           font-weight: 600;
+           display: inline-block;
+           margin-top: 10px;
+           box-shadow: 0 2px 5px rgba(46, 125, 50, 0.3);
+       }
+       .placeholder {
+           color: #a0aec0;
+           padding: 30px;
+           text-align: center;
+       }
+       .placeholder i {
+           font-size: 2.5rem;
+           display: block;
+           margin-bottom: 15px;
+           opacity: 0.5;
+       }
        @media (max-width: 400px) {
            h1 { font-size: 1.6rem; }
            button { padding: 15px; font-size: 16px; }
            .price-display { font-size: 32px; }
            .detail-item { min-width: 100%; }
+           .usd-price { font-size: 2rem; }
+           .breakdown-grid { grid-template-columns: 1fr; }
        }
 </style>
 </head>
@@ -177,14 +329,19 @@
 <button id="searchBtn">查詢鑽石報價</button>
 </div>
 <div class="result-container">
-<div id="result"><div style="color: #a0aec0; padding: 30px;">請輸入鑽石參數後點擊查詢按鈕</div></div>
+<div id="result">
+    <div class="placeholder">
+        <i>💎</i>
+        請輸入鑽石參數後點擊查詢按鈕
+    </div>
+</div>
 <div id="error"></div>
 </div>
 </div>
 <footer>© 2023-2025 RAPAPORT鑽石報價查詢系統 | 六福專用版</footer>
 </div>
 <script>
-        // RAPAPORT钻石报价数据（已修正错误）
+        // RAPAPORT钻石报价数据
 const RAPAPORT = {
     "2023": {
         "0.30-0.39": { headers: ["IF", "VVS1", "VVS2", "VS1", "VS2", "SI1", "SI2"], 
@@ -621,13 +778,70 @@ const RAPAPORT = {
             // 5. Amount HK$
             const amtHKD  = parseFloat((amtUSD * EXCHANGE_RATE).toFixed(2));
 
+            // 格式化數字（千分位）
+            const formatNumber = num => num.toLocaleString('en-US', { 
+                minimumFractionDigits: 2, 
+                maximumFractionDigits: 2 
+            });
+
             result.innerHTML = `
-            <div class="details">
-                <div class="detail-item"><div>1. RAPAPORT 價錢</div><div><strong>US$${rapUSD.toLocaleString()}</strong></div></div>
-                <div class="detail-item"><div>2. Price/Cts. @USD</div><div><strong>US$${pCtsUSD.toLocaleString()}</strong></div></div>
-                <div class="detail-item"><div>3. Amount US$</div><div><strong>US$${amtUSD.toLocaleString()}</strong></div></div>
-                <div class="detail-item"><div>4. Price/Cts. @HKD</div><div><strong>HK$${pCtsHKD.toLocaleString()}</strong></div></div>
-                <div class="detail-item"><div>5. Amount HK$</div><div><strong>HK$${amtHKD.toLocaleString()}</strong></div></div>
+            <div class="result-header">
+                <div class="diamond-info">
+                    <h3>鑽石規格詳情</h3>
+                    <div class="diamond-spec">
+                        <div class="spec-item">${carat} 克拉</div>
+                        <div class="spec-item">${color} 色</div>
+                        <div class="spec-item">${clarity} 淨度</div>
+                        <div class="spec-item">${year} 年報價</div>
+                    </div>
+                </div>
+                <div class="diamond-icon">💎</div>
+            </div>
+            
+            <div class="price-summary">
+                <div class="price-title">
+                    <i>💰</i> 折扣後總價格
+                </div>
+                <div class="usd-price">US$${formatNumber(amtUSD)}</div>
+                <div class="hkd-equivalent">約 HK$${formatNumber(amtHKD)}</div>
+                
+                ${discount > 0 ? 
+                    `<div class="discount-badge">已應用 ${discount}% 折扣</div>` : 
+                    `<div class="price-per-carat">每克拉價格: US$${formatNumber(pCtsUSD)}</div>`
+                }
+            </div>
+            
+            <div class="price-breakdown">
+                <div class="breakdown-title">
+                    <i>📊</i> 價格明細
+                </div>
+                <div class="breakdown-grid">
+                    <div class="breakdown-card">
+                        <h4>RAPAPORT 價錢</h4>
+                        <div class="breakdown-value">US$${formatNumber(rapUSD)}</div>
+                        <div>每克拉</div>
+                    </div>
+                    <div class="breakdown-card">
+                        <h4>Price/Cts. @USD</h4>
+                        <div class="breakdown-value usd">US$${formatNumber(pCtsUSD)}</div>
+                        <div>折後每克拉</div>
+                    </div>
+                    <div class="breakdown-card">
+                        <h4>Amount US$</h4>
+                        <div class="breakdown-value usd">US$${formatNumber(amtUSD)}</div>
+                        <div>總價 (美元)</div>
+                    </div>
+                    <div class="breakdown-card">
+                        <h4>Price/Cts. @HKD</h4>
+                        <div class="breakdown-value hkd">HK$${formatNumber(pCtsHKD)}</div>
+                        <div>折後每克拉</div>
+                    </div>
+                    <div class="breakdown-card">
+                        <h4>Amount HK$</h4>
+                        <div class="breakdown-value hkd">HK$${formatNumber(amtHKD)}</div>
+                        <div>總價 (港幣)</div>
+                    </div>
+                </div>
             </div>`;
         }
 
@@ -636,4 +850,3 @@ const RAPAPORT = {
     </script>
 </body>
 </html>
-
