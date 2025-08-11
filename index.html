@@ -5,343 +5,495 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>RAPAPORT 鑽石報價查詢</title>
 <style>
-       * {
-           box-sizing: border-box;
-           margin: 0;
-           padding: 0;
-           -webkit-tap-highlight-color: transparent;
-           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-       }
-       body {
-           background: linear-gradient(135deg, #1a2a6c 0%, #2a5298 100%);
-           padding: 15px;
-           min-height: 100vh;
-           color: #333;
-           display: flex;
-           justify-content: center;
-           align-items: center;
-       }
-       .container {
-           width: 100%;
-           max-width: 500px;
-           background: white;
-           border-radius: 16px;
-           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-           overflow: hidden;
-       }
-       header {
-           background: linear-gradient(120deg, #1a2a6c, #2a5298);
-           color: white;
-           padding: 25px 20px;
-           text-align: center;
-           position: relative;
-       }
-       header::before {
-           content: "💎";
-           position: absolute;
-           top: 15px;
-           right: 20px;
-           font-size: 40px;
-           opacity: 0.15;
-       }
-       h1 {
-           font-size: 1.8rem;
-           margin-bottom: 8px;
-           font-weight: 700;
-           text-shadow: 0 1px 3px rgba(0,0,0,0.2);
-       }
-       .subtitle {
-           font-size: 1rem;
-           opacity: 0.9;
-           margin-bottom: 5px;
-       }
-       .exchange-rate {
-           background: rgba(255, 255, 255, 0.15);
-           display: inline-block;
-           padding: 5px 12px;
-           border-radius: 20px;
-           font-size: 14px;
-           margin-top: 8px;
-           font-weight: 500;
-       }
-       .content { padding: 20px; }
-       .input-group { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px; }
-       .input-field { margin-bottom: 15px; }
-       label {
-           display: flex; align-items: center;
-           margin-bottom: 8px;
-           font-weight: 600;
-           color: #2c3e50;
-           font-size: 16px;
-       }
-       label i { margin-right: 10px; font-size: 20px; color: #4a6cf7; }
-       input, select {
-           width: 100%;
-           padding: 15px;
-           border: 1px solid #d1d9e6;
-           border-radius: 10px;
-           font-size: 16px;
-           background: #f8fafc;
-           transition: all 0.3s ease;
-       }
-       input:focus, select:focus {
-           outline: none;
-           border-color: #4a6cf7;
-           box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.2);
-       }
-       .button-group { text-align: center; margin: 25px 0 15px; }
-       button {
-           background: linear-gradient(to right, #4a6cf7, #6a5af9);
-           color: white;
-           border: none;
-           padding: 17px 45px;
-           font-size: 18px;
-           font-weight: 600;
-           border-radius: 12px;
-           cursor: pointer;
-           width: 100%;
-           max-width: 300px;
-           transition: all 0.3s ease;
-           box-shadow: 0 5px 15px rgba(74, 108, 247, 0.4);
-       }
-       button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(74, 108, 247, 0.5); }
-       button:active { transform: translateY(1px); }
-       .result-container {
-           background: #f8fafd;
-           border-radius: 12px;
-           padding: 25px 20px;
-           border: 1px solid #e2e8f0;
-           margin-top: 15px;
-           text-align: center;
-       }
-       #result { font-size: 18px; line-height: 1.6; color: #2d3748; min-height: 150px; }
-       #error { color: #e53e3e; font-size: 15px; margin-top: 15px; font-weight: 500; }
-       .price-display { font-size: 40px; font-weight: 700; color: #4a6cf7; margin: 15px 0; }
-       .price-note, .discount-label { font-size: 16px; color: #2e7d32; margin-top: 5px; font-weight: 500; }
-       .hkd-price { font-size: 24px; font-weight: 600; color: #1a2a6c; margin: 10px 0; padding: 8px 15px; border-radius: 8px; background: rgba(26, 42, 108, 0.08); }
-       .details { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 20px; width: 100%; max-width: 400px; }
-       .detail-item { background: rgba(74, 108, 247, 0.08); padding: 12px 15px; border-radius: 10px; font-weight: 500; min-width: 140px; }
-       footer { text-align: center; padding: 20px 15px; color: #718096; font-size: 14px; border-top: 1px solid #e2e8f0; }
-       
-       /* 優化結果介面 */
-       .result-header {
-           display: flex;
-           justify-content: space-between;
-           align-items: center;
-           background: linear-gradient(120deg, #f8fafd, #eef2ff);
-           border-radius: 12px;
-           padding: 15px;
-           margin-bottom: 20px;
-           border: 1px solid #e0e7ff;
-           box-shadow: 0 4px 12px rgba(74, 108, 247, 0.1);
-       }
-       .diamond-info {
-           text-align: left;
-       }
-       .diamond-info h3 {
-           font-size: 1.1rem;
-           color: #1a2a6c;
-           margin-bottom: 8px;
-       }
-       .diamond-spec {
-           font-size: 0.9rem;
-           color: #4a5568;
-           display: flex;
-           flex-wrap: wrap;
-           gap: 8px;
-       }
-       .spec-item {
-           background: rgba(74, 108, 247, 0.1);
-           padding: 4px 10px;
-           border-radius: 20px;
-           font-size: 0.85rem;
-       }
-       .diamond-icon {
-           font-size: 2.5rem;
-           color: #4a6cf7;
-           opacity: 0.8;
-       }
-       .price-summary {
-           background: linear-gradient(135deg, #4a6cf7, #6a5af9);
-           border-radius: 12px;
-           padding: 25px 15px;
-           color: white;
-           margin: 20px auto;
-           max-width: 90%;
-           box-shadow: 0 6px 18px rgba(74, 108, 247, 0.3);
-       }
-       .price-title {
-           font-size: 1.1rem;
-           margin-bottom: 15px;
-           display: flex;
-           align-items: center;
-           justify-content: center;
-           gap: 8px;
-       }
-       .price-title i {
-           font-size: 1.4rem;
-       }
-       .usd-price {
-           font-size: 2.5rem;
-           font-weight: 700;
-           margin: 10px 0;
-           text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-       }
-       .hkd-equivalent {
-           font-size: 1.2rem;
-           opacity: 0.9;
-           margin-top: 5px;
-       }
-       .price-per-carat {
-           background: rgba(255, 255, 255, 0.15);
-           border-radius: 10px;
-           padding: 10px;
-           margin-top: 15px;
-           font-size: 0.9rem;
-       }
-       .price-breakdown {
-           background: #f8fafd;
-           border-radius: 12px;
-           padding: 20px 15px;
-           border: 1px solid #e2e8f0;
-           margin-top: 20px;
-       }
-       .breakdown-title {
-           font-size: 1.1rem;
-           color: #1a2a6c;
-           margin-bottom: 15px;
-           text-align: center;
-           display: flex;
-           align-items: center;
-           justify-content: center;
-           gap: 8px;
-       }
-       .breakdown-grid {
-           display: grid;
-           grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-           gap: 12px;
-           margin-top: 15px;
-       }
-       .breakdown-card {
-           background: white;
-           border-radius: 10px;
-           padding: 15px 10px;
-           box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-           border: 1px solid #edf2f7;
-           transition: transform 0.3s ease;
-       }
-       .breakdown-card:hover {
-           transform: translateY(-3px);
-           box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-       }
-       .breakdown-card h4 {
-           font-size: 0.85rem;
-           color: #4a5568;
-           margin-bottom: 8px;
-       }
-       .breakdown-value {
-           font-size: 1.1rem;
-           font-weight: 600;
-           color: #1a2a6c;
-       }
-       .breakdown-value.usd {
-           color: #4a6cf7;
-       }
-       .breakdown-value.hkd {
-           color: #2e7d32;
-       }
-       .discount-badge {
-           background: linear-gradient(135deg, #2e7d32, #43a047);
-           color: white;
-           padding: 3px 12px;
-           border-radius: 20px;
-           font-size: 0.8rem;
-           font-weight: 600;
-           display: inline-block;
-           margin-top: 10px;
-           box-shadow: 0 2px 5px rgba(46, 125, 50, 0.3);
-       }
-       .placeholder {
-           color: #a0aec0;
-           padding: 30px;
-           text-align: center;
-       }
-       .placeholder i {
-           font-size: 2.5rem;
-           display: block;
-           margin-bottom: 15px;
-           opacity: 0.5;
-       }
-       @media (max-width: 400px) {
-           h1 { font-size: 1.6rem; }
-           button { padding: 15px; font-size: 16px; }
-           .price-display { font-size: 32px; }
-           .detail-item { min-width: 100%; }
-           .usd-price { font-size: 2rem; }
-           .breakdown-grid { grid-template-columns: 1fr; }
-       }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+body {
+    background: linear-gradient(135deg, #1a2a6c 0%, #2a5298 100%);
+    padding: 15px;
+    min-height: 100vh;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.container {
+    width: 100%;
+    max-width: 500px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    position: relative;
+}
+header {
+    background: linear-gradient(120deg, #1a2a6c, #2a5298);
+    color: white;
+    padding: 25px 20px;
+    text-align: center;
+    position: relative;
+}
+header::before {
+    content: "💎";
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 40px;
+    opacity: 0.15;
+}
+h1 {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+    font-weight: 700;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.subtitle {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin-bottom: 5px;
+}
+.exchange-rate {
+    background: rgba(255, 255, 255, 0.15);
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    margin-top: 8px;
+    font-weight: 500;
+}
+.content { padding: 20px; }
+.input-group { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px; }
+.input-field { margin-bottom: 15px; }
+label {
+    display: flex; align-items: center;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 16px;
+}
+label i { margin-right: 10px; font-size: 20px; color: #4a6cf7; }
+input, select {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #d1d9e6;
+    border-radius: 10px;
+    font-size: 16px;
+    background: #f8fafc;
+    transition: all 0.3s ease;
+}
+input:focus, select:focus {
+    outline: none;
+    border-color: #4a6cf7;
+    box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.2);
+}
+.button-group { text-align: center; margin: 25px 0 15px; }
+button {
+    background: linear-gradient(to right, #4a6cf7, #6a5af9);
+    color: white;
+    border: none;
+    padding: 17px 45px;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    width: 100%;
+    max-width: 300px;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(74, 108, 247, 0.4);
+}
+button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(74, 108, 247, 0.5); }
+button:active { transform: translateY(1px); }
+.result-container {
+    background: #f8fafd;
+    border-radius: 12px;
+    padding: 25px 20px;
+    border: 1px solid #e2e8f0;
+    margin-top: 15px;
+    text-align: center;
+}
+#result { font-size: 18px; line-height: 1.6; color: #2d3748; min-height: 150px; }
+#error { color: #e53e3e; font-size: 15px; margin-top: 15px; font-weight: 500; }
+.price-display { font-size: 40px; font-weight: 700; color: #4a6cf7; margin: 15px 0; }
+.price-note, .discount-label { font-size: 16px; color: #2e7d32; margin-top: 5px; font-weight: 500; }
+.hkd-price { font-size: 24px; font-weight: 600; color: #1a2a6c; margin: 10px 0; padding: 8px 15px; border-radius: 8px; background: rgba(26, 42, 108, 0.08); }
+.details { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 20px; width: 100%; max-width: 400px; }
+.detail-item { background: rgba(74, 108, 247, 0.08); padding: 12px 15px; border-radius: 10px; font-weight: 500; min-width: 140px; }
+footer { text-align: center; padding: 20px 15px; color: #718096; font-size: 14px; border-top: 1px solid #e2e8f0; }
+
+/* 優化結果介面 */
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(120deg, #f8fafd, #eef2ff);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #e0e7ff;
+    box-shadow: 0 4px 12px rgba(74, 108, 247, 0.1);
+}
+.diamond-info {
+    text-align: left;
+}
+.diamond-info h3 {
+    font-size: 1.1rem;
+    color: #1a2a6c;
+    margin-bottom: 8px;
+}
+.diamond-spec {
+    font-size: 0.9rem;
+    color: #4a5568;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.spec-item {
+    background: rgba(74, 108, 247, 0.1);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+}
+.diamond-icon {
+    font-size: 2.5rem;
+    color: #4a6cf7;
+    opacity: 0.8;
+}
+.price-summary {
+    background: linear-gradient(135deg, #4a6cf7, #6a5af9);
+    border-radius: 12px;
+    padding: 25px 15px;
+    color: white;
+    margin: 20px auto;
+    max-width: 90%;
+    box-shadow: 0 6px 18px rgba(74, 108, 247, 0.3);
+}
+.price-title {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.price-title i {
+    font-size: 1.4rem;
+}
+.usd-price {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 10px 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.hkd-equivalent {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin-top: 5px;
+}
+.price-per-carat {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 15px;
+    font-size: 0.9rem;
+}
+.price-breakdown {
+    background: #f8fafd;
+    border-radius: 12px;
+    padding: 20px 15px;
+    border: 1px solid #e2e8f0;
+    margin-top: 20px;
+}
+.breakdown-title {
+    font-size: 1.1rem;
+    color: #1a2a6c;
+    margin-bottom: 15px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.breakdown-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-top: 15px;
+}
+.breakdown-card {
+    background: white;
+    border-radius: 10px;
+    padding: 15px 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #edf2f7;
+    transition: transform 0.3s ease;
+}
+.breakdown-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+.breakdown-card h4 {
+    font-size: 0.85rem;
+    color: #4a5568;
+    margin-bottom: 8px;
+}
+.breakdown-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a2a6c;
+}
+.breakdown-value.usd {
+    color: #4a6cf7;
+}
+.breakdown-value.hkd {
+    color: #2e7d32;
+}
+.discount-badge {
+    background: linear-gradient(135deg, #2e7d32, #43a047);
+    color: white;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-block;
+    margin-top: 10px;
+    box-shadow: 0 2px 5px rgba(46, 125, 50, 0.3);
+}
+.placeholder {
+    color: #a0aec0;
+    padding: 30px;
+    text-align: center;
+}
+.placeholder i {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+/* 多语言切换按钮 */
+.lang-switch {
+    position: absolute;
+    top: 15px;
+    left: 20px;
+    z-index: 10;
+}
+.lang-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.lang-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+/* 多年份选择器 */
+.year-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 5px;
+}
+.year-option {
+    display: flex;
+    align-items: center;
+    background: #f1f5f9;
+    padding: 8px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 1px solid #e2e8f0;
+}
+.year-option:hover {
+    background: #e6f0ff;
+    border-color: #4a6cf7;
+}
+.year-option.selected {
+    background: #e6f0ff;
+    border-color: #4a6cf7;
+    box-shadow: 0 0 0 2px rgba(74, 108, 247, 0.3);
+}
+.year-option input {
+    display: none;
+}
+.year-option span {
+    font-size: 15px;
+    font-weight: 500;
+    color: #1e293b;
+}
+/* 多年份对比表格 */
+.comparison-table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+}
+.comparison-table th {
+    background: #4a6cf7;
+    color: white;
+    padding: 12px 15px;
+    text-align: center;
+    font-weight: 600;
+}
+.comparison-table td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px solid #e2e8f0;
+}
+.comparison-table tr:nth-child(even) {
+    background-color: #f8fafd;
+}
+.comparison-table tr:hover {
+    background-color: #eef2ff;
+}
+.price-change {
+    font-weight: 600;
+}
+.price-change.positive {
+    color: #2e7d32;
+}
+.price-change.negative {
+    color: #e53e3e;
+}
+.comparison-summary {
+    background: #f8fafd;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+}
+.comparison-summary h3 {
+    color: #1a2a6c;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.comparison-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px dashed #e2e8f0;
+}
+.comparison-item:last-child {
+    border-bottom: none;
+}
+.comparison-label {
+    font-weight: 600;
+    color: #4a5568;
+}
+.comparison-value {
+    font-weight: 600;
+    color: #1a2a6c;
+}
+@media (max-width: 400px) {
+    h1 { font-size: 1.6rem; }
+    button { padding: 15px; font-size: 16px; }
+    .price-display { font-size: 32px; }
+    .detail-item { min-width: 100%; }
+    .usd-price { font-size: 2rem; }
+    .breakdown-grid { grid-template-columns: 1fr; }
+    .comparison-table th, 
+    .comparison-table td {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+    .year-option {
+        padding: 6px 12px;
+    }
+}
 </style>
 </head>
 <body>
 <div class="container">
-<header>
-<h1>RAPAPORT 鑽石報價查詢</h1>
-<div class="subtitle">市場鑽石價格計算工具</div>
-<div class="exchange-rate">1 USD = 7.85 HKD</div>
-</header>
-<div class="content">
-<div class="input-group">
-<div class="input-field">
-<label for="carat"><i>💎</i> 主石份數 (ct)</label>
-<input type="number" id="carat" step="0.01" placeholder="例如: 1.25" min="0.30" max="3.99" inputmode="decimal">
-</div>
-<div class="input-field">
-<label for="color"><i>🎨</i> 顏色 (Color)</label>
-<select id="color">
-<option value="">請選擇顏色</option>
-<option>D</option><option>E</option><option>F</option>
-<option>G</option><option>H</option><option>I</option>
-<option>J</option><option>K</option><option>L</option><option>M</option>
-</select>
-</div>
-<div class="input-field">
-<label for="clarity"><i>🔍</i> 淨度 (Clarity)</label>
-<select id="clarity">
-<option value="">請選擇淨度</option>
-<option>IF</option><option>VVS1</option><option>VVS2</option>
-<option>VS1</option><option>VS2</option><option>SI1</option><option>SI2</option>
-</select>
-</div>
-<div class="input-field">
-<label for="year"><i>📅</i> 年份</label>
-<select id="year">
-<option value="2023">2023</option>
-<option value="2024" selected>2024</option>
-<option value="2025">2025</option>
-</select>
-</div>
-<div class="input-field">
-<label for="discount"><i>💰</i> 折扣 (%)</label>
-<input type="number" id="discount" step="1" placeholder="例如: 30" min="0" max="100" value="0">
-</div>
-</div>
-<div class="button-group">
-<button id="searchBtn">查詢鑽石報價</button>
-</div>
-<div class="result-container">
-<div id="result">
-    <div class="placeholder">
-        <i>💎</i>
-        請輸入鑽石參數後點擊查詢按鈕
+    <!-- 语言切换按钮 -->
+    <div class="lang-switch">
+        <button class="lang-btn" id="langBtn">EN</button>
     </div>
+    
+    <header>
+        <h1>RAPAPORT 鑽石報價查詢</h1>
+        <div class="subtitle">市場鑽石價格計算工具</div>
+        <div class="exchange-rate">1 USD = 7.85 HKD</div>
+    </header>
+    
+    <div class="content">
+        <div class="input-group">
+            <div class="input-field">
+                <label for="carat"><i>💎</i> 主石份數 (ct)</label>
+                <input type="number" id="carat" step="0.01" placeholder="例如: 1.25" min="0.30" max="3.99" inputmode="decimal">
+            </div>
+            <div class="input-field">
+                <label for="color"><i>🎨</i> 顏色 (Color)</label>
+                <select id="color">
+                    <option value="">請選擇顏色</option>
+                    <option>D</option><option>E</option><option>F</option>
+                    <option>G</option><option>H</option><option>I</option>
+                    <option>J</option><option>K</option><option>L</option><option>M</option>
+                </select>
+            </div>
+            <div class="input-field">
+                <label for="clarity"><i>🔍</i> 淨度 (Clarity)</label>
+                <select id="clarity">
+                    <option value="">請選擇淨度</option>
+                    <option>IF</option><option>VVS1</option><option>VVS2</option>
+                    <option>VS1</option><option>VS2</option><option>SI1</option><option>SI2</option>
+                </select>
+            </div>
+            <div class="input-field">
+                <label><i>📅</i> 年份 (可多選)</label>
+                <div class="year-selector" id="yearSelector">
+                    <div class="year-option" data-year="2023">
+                        <input type="checkbox" value="2023">
+                        <span>2023</span>
+                    </div>
+                    <div class="year-option selected" data-year="2024">
+                        <input type="checkbox" value="2024" checked>
+                        <span>2024</span>
+                    </div>
+                    <div class="year-option" data-year="2025">
+                        <input type="checkbox" value="2025">
+                        <span>2025</span>
+                    </div>
+                </div>
+            </div>
+            <div class="input-field">
+                <label for="discount"><i>💰</i> 折扣 (%)</label>
+                <input type="number" id="discount" step="1" placeholder="例如: 30" min="0" max="100" value="0">
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button id="searchBtn">查詢鑽石報價</button>
+        </div>
+        
+        <div class="result-container">
+            <div id="result">
+                <div class="placeholder">
+                    <i>💎</i>
+                    請輸入鑽石參數後點擊查詢按鈕
+                </div>
+            </div>
+            <div id="error"></div>
+        </div>
+    </div>
+    
+    <footer>© 2023-2025 RAPAPORT鑽石報價查詢系統 | 六福專用版</footer>
 </div>
-<div id="error"></div>
-</div>
-</div>
-<footer>© 2023-2025 RAPAPORT鑽石報價查詢系統 | 六福專用版</footer>
-</div>
+
 <script>
-        // RAPAPORT钻石报价数据
+// RAPAPORT钻石报价数据
 const RAPAPORT = {
     "2023": {
         "0.30-0.39": { headers: ["IF", "VVS1", "VVS2", "VS1", "VS2", "SI1", "SI2"], 
@@ -728,125 +880,304 @@ const RAPAPORT = {
         }
     }
 };
-  const EXCHANGE_RATE = 7.85;
 
-        function getCaratRange(carat) {
-            return Object.keys(RAPAPORT['2024']).find(r => {
-                const [min, max] = r.split('-').map(parseFloat);
-                return carat >= min && carat <= max;
-            });
+const EXCHANGE_RATE = 7.85;
+
+// 获取选中的年份
+function getSelectedYears() {
+    const selected = [];
+    document.querySelectorAll('.year-option input:checked').forEach(checkbox => {
+        selected.push(checkbox.value);
+    });
+    return selected;
+}
+
+// 获取克拉范围
+function getCaratRange(carat) {
+    return Object.keys(RAPAPORT['2024']).find(r => {
+        const [min, max] = r.split('-').map(parseFloat);
+        return carat >= min && carat <= max;
+    });
+}
+
+// 格式化数字（千分位）
+function formatNumber(num) {
+    return num.toLocaleString('en-US', { 
+        minimumFractionDigits: 2, 
+        maximumFractionDigits: 2 
+    });
+}
+
+// 计算钻石价格
+function calculatePrice(year, carat, color, clarity, discount) {
+    const range = getCaratRange(carat);
+    const data = RAPAPORT[year]?.[range];
+    if (!data) return null;
+    
+    const idx = data.headers.indexOf(clarity);
+    const perCtArr = data.rows[color];
+    if (idx < 0 || !perCtArr) return null;
+    
+    // 1. RAPAPORT 价 (USD per ct)
+    const rapUSD = perCtArr[idx] * 100;
+    // 2. 折后每克拉 USD
+    const pCtsUSD = Math.round(rapUSD * (1 - discount / 100));
+    // 3. Amount US$
+    const amtUSD = parseFloat((pCtsUSD * carat).toFixed(2));
+    // 4. Price/Cts. @HKD
+    const pCtsHKD = parseFloat((pCtsUSD * EXCHANGE_RATE).toFixed(2));
+    // 5. Amount HK$
+    const amtHKD = parseFloat((amtUSD * EXCHANGE_RATE).toFixed(2));
+    
+    return {
+        year,
+        rapUSD,
+        pCtsUSD,
+        amtUSD,
+        pCtsHKD,
+        amtHKD
+    };
+}
+
+// 搜索价格
+function searchPrice() {
+    const selectedYears = getSelectedYears();
+    const carat = parseFloat(document.getElementById('carat').value || 0);
+    const color = document.getElementById('color').value;
+    const clarity = document.getElementById('clarity').value;
+    const discount = parseFloat(document.getElementById('discount').value || 0);
+    const result = document.getElementById('result');
+    const error = document.getElementById('error');
+    
+    result.innerHTML = '';
+    error.textContent = '';
+    
+    // 验证输入
+    if (!carat || !color || !clarity) {
+        error.textContent = '❌ 請確實輸入所有參數';
+        return;
+    }
+    if (isNaN(carat) || carat < 0.3 || carat > 3.99) {
+        error.textContent = '❌ 主石份數需介於 0.30-3.99'; 
+        return;
+    }
+    if (isNaN(discount) || discount < 0 || discount > 100) {
+        error.textContent = '❌ 折扣需介於 0-100%'; 
+        return;
+    }
+    if (selectedYears.length === 0) {
+        error.textContent = '❌ 請選擇至少一個年份';
+        return;
+    }
+    
+    // 计算每个年份的价格
+    const priceResults = [];
+    for (const year of selectedYears) {
+        const price = calculatePrice(year, carat, color, clarity, discount);
+        if (price) {
+            priceResults.push(price);
         }
+    }
+    
+    if (priceResults.length === 0) {
+        error.textContent = '❌ 找不到對應數據';
+        return;
+    }
+    
+    // 根据选择年份数量展示不同结果
+    if (priceResults.length === 1) {
+        showSingleYearResult(priceResults[0], carat, color, clarity, discount);
+    } else {
+        showMultiYearComparison(priceResults, carat, color, clarity, discount);
+    }
+}
 
-        function searchPrice() {
-            const year    = document.getElementById('year').value;
-            const carat   = parseFloat(document.getElementById('carat').value || 0);
-            const color   = document.getElementById('color').value;
-            const clarity = document.getElementById('clarity').value;
-            const discount= parseFloat(document.getElementById('discount').value || 0);
-            const result  = document.getElementById('result');
-            const error   = document.getElementById('error');
-            result.innerHTML = '';
-            error.textContent = '';
-
-            if (!carat || !color || !clarity) {
-                error.textContent = '❌ 請確實輸入所有參數';
-                return;
-            }
-            if (isNaN(carat) || carat < 0.3 || carat > 3.99) {
-                error.textContent = '❌ 主石份數需介於 0.30-3.99'; return;
-            }
-            if (isNaN(discount) || discount < 0 || discount > 100) {
-                error.textContent = '❌ 折扣需介於 0-100%'; return;
-            }
-
-            const range = getCaratRange(carat);
-            const data  = RAPAPORT[year]?.[range];
-            if (!data) { error.textContent = '❌ 找不到對應數據'; return; }
-
-            const idx      = data.headers.indexOf(clarity);
-            const perCtArr = data.rows[color];
-            if (idx < 0 || !perCtArr) { error.textContent = '❌ 顏色或淨度無對應'; return; }
-
-            // 1. RAPAPORT 價錢 (USD per ct)
-            const rapUSD = perCtArr[idx] * 100;
-            // 2. 折後每克拉 USD
-            const pCtsUSD = Math.round(rapUSD * (1 - discount / 100));
-            // 3. Amount US$
-            const amtUSD = parseFloat((pCtsUSD * carat).toFixed(2));
-            // 4. Price/Cts. @HKD
-            const pCtsHKD = parseFloat((pCtsUSD * EXCHANGE_RATE).toFixed(2));
-            // 5. Amount HK$
-            const amtHKD  = parseFloat((amtUSD * EXCHANGE_RATE).toFixed(2));
-
-            // 格式化數字（千分位）
-            const formatNumber = num => num.toLocaleString('en-US', { 
-                minimumFractionDigits: 2, 
-                maximumFractionDigits: 2 
-            });
-
-            result.innerHTML = `
-            <div class="result-header">
-                <div class="diamond-info">
-                    <h3>鑽石規格詳情</h3>
-                    <div class="diamond-spec">
-                        <div class="spec-item">${carat} 克拉</div>
-                        <div class="spec-item">${color} 色</div>
-                        <div class="spec-item">${clarity} 淨度</div>
-                        <div class="spec-item">${year} 年報價</div>
-                    </div>
-                </div>
-                <div class="diamond-icon">💎</div>
+// 显示单一年份结果
+function showSingleYearResult(price, carat, color, clarity, discount) {
+    const result = document.getElementById('result');
+    
+    result.innerHTML = `
+    <div class="result-header">
+        <div class="diamond-info">
+            <h3>鑽石規格詳情</h3>
+            <div class="diamond-spec">
+                <div class="spec-item">${carat} 克拉</div>
+                <div class="spec-item">${color} 色</div>
+                <div class="spec-item">${clarity} 淨度</div>
+                <div class="spec-item">${price.year} 年報價</div>
             </div>
-            
-            <div class="price-summary">
-                <div class="price-title">
-                    <i>💰</i> 折扣後總價格
-                </div>
-                <div class="usd-price">US$${formatNumber(amtUSD)}</div>
-                <div class="hkd-equivalent">約 HK$${formatNumber(amtHKD)}</div>
-                
-                ${discount > 0 ? 
-                    `<div class="discount-badge">已應用 ${discount}% 折扣</div>` : 
-                    `<div class="price-per-carat">每克拉價格: US$${formatNumber(pCtsUSD)}</div>`
-                }
-            </div>
-            
-            <div class="price-breakdown">
-                <div class="breakdown-title">
-                    <i>📊</i> 價格明細
-                </div>
-                <div class="breakdown-grid">
-                    <div class="breakdown-card">
-                        <h4>RAPAPORT 價錢</h4>
-                        <div class="breakdown-value">US$${formatNumber(rapUSD)}</div>
-                        <div>每克拉</div>
-                    </div>
-                    <div class="breakdown-card">
-                        <h4>Price/Cts. @USD</h4>
-                        <div class="breakdown-value usd">US$${formatNumber(pCtsUSD)}</div>
-                        <div>折後每克拉</div>
-                    </div>
-                    <div class="breakdown-card">
-                        <h4>Amount US$</h4>
-                        <div class="breakdown-value usd">US$${formatNumber(amtUSD)}</div>
-                        <div>總價 (美元)</div>
-                    </div>
-                    <div class="breakdown-card">
-                        <h4>Price/Cts. @HKD</h4>
-                        <div class="breakdown-value hkd">HK$${formatNumber(pCtsHKD)}</div>
-                        <div>折後每克拉</div>
-                    </div>
-                    <div class="breakdown-card">
-                        <h4>Amount HK$</h4>
-                        <div class="breakdown-value hkd">HK$${formatNumber(amtHKD)}</div>
-                        <div>總價 (港幣)</div>
-                    </div>
-                </div>
-            </div>`;
+        </div>
+        <div class="diamond-icon">💎</div>
+    </div>
+    
+    <div class="price-summary">
+        <div class="price-title">
+            <i>💰</i> 折扣後總價格
+        </div>
+        <div class="usd-price">US$${formatNumber(price.amtUSD)}</div>
+        <div class="hkd-equivalent">≈ HK$${formatNumber(price.amtHKD)}</div>
+        
+        ${discount > 0 ? 
+            `<div class="discount-badge">已應用 ${discount}% 折扣</div>` : 
+            `<div class="price-per-carat">每克拉價格: US$${formatNumber(price.pCtsUSD)}</div>`
         }
+    </div>
+    
+    <div class="price-breakdown">
+        <div class="breakdown-title">
+            <i>📊</i> 價格明細
+        </div>
+        <div class="breakdown-grid">
+            <div class="breakdown-card">
+                <h4>RAPAPORT 價錢</h4>
+                <div class="breakdown-value">US$${formatNumber(price.rapUSD)}</div>
+                <div>每克拉</div>
+            </div>
+            <div class="breakdown-card">
+                <h4>Price/Cts. @USD</h4>
+                <div class="breakdown-value usd">US$${formatNumber(price.pCtsUSD)}</div>
+                <div>折後每克拉</div>
+            </div>
+            <div class="breakdown-card">
+                <h4>Amount US$</h4>
+                <div class="breakdown-value usd">US$${formatNumber(price.amtUSD)}</div>
+                <div>總價 (美元)</div>
+            </div>
+            <div class="breakdown-card">
+                <h4>Price/Cts. @HKD</h4>
+                <div class="breakdown-value hkd">HK$${formatNumber(price.pCtsHKD)}</div>
+                <div>折後每克拉</div>
+            </div>
+            <div class="breakdown-card">
+                <h4>Amount HK$</h4>
+                <div class="breakdown-value hkd">HK$${formatNumber(price.amtHKD)}</div>
+                <div>總價 (港幣)</div>
+            </div>
+        </div>
+    </div>`;
+}
 
-        document.getElementById('searchBtn').addEventListener('click', searchPrice);
-        document.addEventListener('keypress', e => e.key === 'Enter' && searchPrice());
-    </script>
+// 显示多年份对比
+function showMultiYearComparison(prices, carat, color, clarity, discount) {
+    const result = document.getElementById('result');
+    
+    // 按年份排序
+    prices.sort((a, b) => a.year - b.year);
+    
+    // 计算价格变化
+    const basePrice = prices[0].amtUSD;
+    for (let i = 0; i < prices.length; i++) {
+        prices[i].change = i === 0 ? 0 : prices[i].amtUSD - basePrice;
+        prices[i].changePercent = i === 0 ? 0 : (prices[i].change / basePrice * 100);
+    }
+    
+    // 计算摘要信息
+    const minPrice = Math.min(...prices.map(p => p.amtUSD));
+    const maxPrice = Math.max(...prices.map(p => p.amtUSD));
+    const priceDifference = maxPrice - minPrice;
+    const averagePrice = prices.reduce((sum, p) => sum + p.amtUSD, 0) / prices.length;
+    
+    // 生成表格行
+    const tableRows = prices.map(price => {
+        return `
+        <tr>
+            <td>${price.year}</td>
+            <td>US$${formatNumber(price.pCtsUSD)}</td>
+            <td>US$${formatNumber(price.amtUSD)}</td>
+            <td>HK$${formatNumber(price.amtHKD)}</td>
+            <td class="price-change ${price.change > 0 ? 'positive' : price.change < 0 ? 'negative' : ''}">
+                ${price.change === 0 ? '基準' : 
+                  `${price.change > 0 ? '+' : ''}${formatNumber(price.change)} (${price.change > 0 ? '+' : ''}${price.changePercent.toFixed(2)}%)`}
+            </td>
+        </tr>`;
+    }).join('');
+    
+    result.innerHTML = `
+    <div class="result-header">
+        <div class="diamond-info">
+            <h3>鑽石規格詳情</h3>
+            <div class="diamond-spec">
+                <div class="spec-item">${carat} 克拉</div>
+                <div class="spec-item">${color} 色</div>
+                <div class="spec-item">${clarity} 淨度</div>
+            </div>
+        </div>
+        <div class="diamond-icon">💎</div>
+    </div>
+    
+    <h3 style="text-align:center; margin:20px 0 15px; color:#1a2a6c;">
+        <i>📈</i> 年份價格對比
+    </h3>
+    
+    <div style="overflow-x:auto;">
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>年份</th>
+                    <th>每克拉價格(USD)</th>
+                    <th>總價(USD)</th>
+                    <th>總價(HKD)</th>
+                    <th>價格變化</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${tableRows}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="comparison-summary">
+        <h3><i>📊</i> 價格對比摘要</h3>
+        
+        <div class="comparison-item">
+            <span class="comparison-label">最低價格:</span>
+            <span class="comparison-value">US$${formatNumber(minPrice)}</span>
+        </div>
+        <div class="comparison-item">
+            <span class="comparison-label">最高價格:</span>
+            <span class="comparison-value">US$${formatNumber(maxPrice)}</span>
+        </div>
+        <div class="comparison-item">
+            <span class="comparison-label">價格差異:</span>
+            <span class="comparison-value">US$${formatNumber(priceDifference)}</span>
+        </div>
+        <div class="comparison-item">
+            <span class="comparison-label">平均價格:</span>
+            <span class="comparison-value">US$${formatNumber(averagePrice)}</span>
+        </div>
+        <div class="comparison-item">
+            <span class="comparison-label">從 ${prices[0].year} 到 ${prices[prices.length-1].year}:</span>
+            <span class="comparison-value price-change ${prices[prices.length-1].change > 0 ? 'positive' : 'negative'}">
+                ${prices[prices.length-1].change > 0 ? '+' : ''}${formatNumber(prices[prices.length-1].change)} (${prices[prices.length-1].changePercent.toFixed(2)}%)
+            </span>
+        </div>
+    </div>`;
+}
+
+// 初始化页面
+document.addEventListener('DOMContentLoaded', function() {
+    // 设置年份选择器
+    document.querySelectorAll('.year-option').forEach(option => {
+        option.addEventListener('click', function() {
+            this.classList.toggle('selected');
+            const checkbox = this.querySelector('input');
+            checkbox.checked = !checkbox.checked;
+        });
+    });
+    
+    // 设置语言切换按钮
+    document.getElementById('langBtn').addEventListener('click', function() {
+        this.textContent = this.textContent === 'EN' ? '繁' : 'EN';
+    });
+    
+    // 设置搜索按钮
+    document.getElementById('searchBtn').addEventListener('click', searchPrice);
+    
+    // 设置回车键搜索
+    document.addEventListener('keypress', e => {
+        if (e.key === 'Enter') searchPrice();
+    });
+});
+</script>
 </body>
 </html>
